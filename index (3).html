@@ -1,0 +1,1177 @@
+:Estudo Bíblico Pro Premium:index.html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo Bíblico Digital Avançado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700&family=Playfair+Display:ital,wght=0,400;0,600;0,700;1,400&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .bible-font { font-family: 'Playfair Display', Georgia, serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        body.theme-light { background-color: #fbfaf5; color: #1e293b; }
+        body.theme-sepia { background-color: #f4ecd8; color: #433422; }
+        body.theme-dark { background-color: #0f172a; color: #f1f5f9; }
+
+        .theme-light .card-bg { background-color: #ffffff; border-color: #e2e8f0; }
+        .theme-sepia .card-bg { background-color: #fdf6e3; border-color: #e4d5b7; }
+        .theme-dark .card-bg { background-color: #1e293b; border-color: #334155; }
+
+        .theme-dark input, .theme-dark select, .theme-dark textarea { background-color: #1e293b !important; color: #f1f5f9 !important; border-color: #475569 !important; }
+        .theme-dark select option { background-color: #1e293b !important; color: #f1f5f9 !important; }
+        .theme-dark .text-stone-700, .theme-dark .text-slate-800 { color: #cbd5e1 !important; }
+        .theme-dark .text-stone-500, .theme-dark .text-stone-800 { color: #94a3b8 !important; }
+        .theme-dark .bg-stone-50, .theme-dark .bg-stone-50\/50 { background-color: #1e293b !important; }
+        .theme-dark .bg-white { background-color: #0f172a !important; color: #f1f5f9 !important; }
+        .theme-dark .book-opt-node:hover { background-color: #334155 !important; }
+
+        .shimmer {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        .theme-dark .shimmer {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .hl-yellow { background-color: #fef08a !important; color: #1e293b !important; }
+        .hl-green { background-color: #bbf7d0 !important; color: #14532d !important; }
+        .hl-blue { background-color: #bfdbfe !important; color: #1e3a8a !important; }
+        .hl-pink { background-color: #fbcfe8 !important; color: #9d174d !important; }
+        
+        .verse-clickable { cursor: pointer; transition: background-color 0.2s; }
+        .verse-clickable:hover { background-color: rgba(245, 158, 11, 0.12); }
+        .word-hl { cursor: pointer; }
+    </style>
+</head>
+<body class="theme-light min-h-screen flex flex-col">
+
+    <header class="border-b card-bg sticky top-0 z-40 px-4 py-3 shadow-sm transition-colors">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center justify-between w-full lg:w-auto gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="bg-amber-100 text-amber-800 p-2 rounded-xl">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-xl bible-font tracking-tight">Estudo Bíblico Digital</h1>
+                        <p class="text-[10px] uppercase tracking-wider font-bold opacity-60">Slugs Sincronizados com o Python</p>
+                    </div>
+                </div>
+                <button onclick="toggleSettingsModal()" class="p-2 rounded-xl border card-bg lg:hidden hover:bg-stone-100">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                <div class="relative flex-1 sm:flex-none">
+                    <select id="versionSelect" class="w-full sm:w-36 pl-3 pr-8 py-2 bg-amber-50 border border-amber-300 rounded-xl text-sm font-bold text-amber-900 focus:outline-none appearance-none cursor-pointer">
+                        <option value="almeida">Almeida (PT)</option>
+                        <option value="kjv">KJV (EN)</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-amber-700">
+                        <i data-lucide="languages" class="w-4 h-4"></i>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-initial">
+                    <div class="relative w-full sm:w-56 z-50">
+                        <button id="bookDropdownBtn" onclick="toggleBookDropdown()" class="w-full px-3 py-2 border rounded-xl text-sm font-medium focus:outline-none card-bg flex items-center justify-between cursor-pointer">
+                            <span id="selectedBookLabel">1 João</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 opacity-60"></i>
+                        </button>
+                        <div id="bookDropdownPanel" class="hidden absolute top-full left-0 mt-1 w-full card-bg border rounded-xl shadow-xl p-2 space-y-2">
+                            <input type="text" id="bookSearchInput" oninput="filterBooks()" placeholder="Buscar livro ou abrev..." class="w-full text-xs p-2 border rounded-lg focus:outline-none bg-stone-50 text-slate-800">
+                            <div id="bookOptionsList" class="max-h-60 overflow-y-auto space-y-0.5 no-scrollbar text-xs"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1 p-1 rounded-xl">
+                        <button onclick="navigateChapter(-1)" class="p-2 border card-bg rounded-xl hover:bg-amber-50 text-amber-800" title="Capítulo Anterior">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <div class="relative w-20">
+                            <select id="chapterSelect" class="w-full pl-3 pr-7 py-2 border rounded-xl text-sm font-medium focus:outline-none card-bg appearance-none cursor-pointer"></select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none opacity-60">
+                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <button onclick="navigateChapter(1)" class="p-2 border card-bg rounded-xl hover:bg-amber-50 text-amber-800" title="Próximo Capítulo">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="toggleSettingsModal()" class="hidden lg:flex p-2 rounded-xl border card-bg hover:opacity-80 items-center justify-center">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="mainGridContainer" class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start transition-all duration-300">
+        
+        <section id="sectionReader" class="lg:col-span-7 xl:col-span-8 flex flex-col card-bg rounded-2xl border shadow-sm overflow-hidden h-auto lg:min-h-[600px] transition-all duration-300 relative group">
+            <button id="prevChapterBtn" onclick="navigateChapter(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full border shadow-md card-bg hover:bg-stone-50 md:opacity-0 md:group-hover:opacity-100 transition-all flex items-center justify-center border-amber-200" title="Capítulo Anterior">
+                <i data-lucide="chevron-left" class="w-5 h-5 text-amber-700"></i>
+            </button>
+
+            <button id="nextChapterBtn" onclick="navigateChapter(1)" class="absolute right-2 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full border shadow-md card-bg hover:bg-stone-50 md:opacity-0 md:group-hover:opacity-100 transition-all flex items-center justify-center border-amber-200" title="Próximo Capítulo">
+                <i data-lucide="chevron-right" class="w-5 h-5 text-amber-700"></i>
+            </button>
+
+            <div class="border-b px-4 py-3 flex flex-wrap items-center justify-between gap-3 bg-stone-50/50">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-2.5 h-2.5 bg-emerald-500 rounded-full"></span>
+                    <h2 id="currentLocationTitle" class="font-bold text-sm md:text-base bible-font">Carregando...</h2>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 bg-stone-100 dark:bg-slate-800 p-1 rounded-xl border border-stone-200 dark:border-slate-700">
+                        <button onclick="applyColorHighlight('hl-yellow')" class="w-6 h-6 rounded-lg bg-yellow-200 hover:scale-110 border border-yellow-300"></button>
+                        <button onclick="applyColorHighlight('hl-green')" class="w-6 h-6 rounded-lg bg-green-200 hover:scale-110 border border-green-300"></button>
+                        <button onclick="applyColorHighlight('hl-blue')" class="w-6 h-6 rounded-lg bg-blue-200 hover:scale-110 border border-blue-300"></button>
+                        <button onclick="applyColorHighlight('hl-pink')" class="w-6 h-6 rounded-lg bg-pink-200 hover:scale-110 border border-pink-300"></button>
+                        <div class="w-[1px] h-4 bg-stone-300 dark:bg-slate-600 mx-1"></div>
+                        <button onclick="clearSelectedHighlight()" class="text-stone-500 hover:text-red-500 p-1 rounded-lg hover:bg-stone-200 dark:hover:bg-slate-700" title="Limpar Seleção Inteligente">
+                            <i data-lucide="eraser" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <button onclick="toggleMaximizeWindow('reader')" class="p-1.5 hover:bg-stone-200 dark:hover:bg-slate-700 rounded-lg border text-stone-600 card-bg" title="Expandir Janela">
+                        <i id="readerMaxIcon" data-lucide="maximize-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="bibleTextContainer" class="flex-1 p-6 md:p-8 px-12 md:px-14 overflow-y-auto max-h-[750px] space-y-4 no-scrollbar bible-font"></div>
+        </section>
+
+        <section id="sectionSidebar" class="lg:col-span-5 xl:col-span-4 flex flex-col card-bg rounded-2xl border shadow-sm overflow-hidden h-[600px] transition-all duration-300">
+            <div class="flex border-b bg-stone-50 text-xs font-bold uppercase tracking-wider items-center justify-between pr-3">
+                <div class="flex flex-1">
+                    <button id="btnTabNotes" onclick="switchPanelTab('notes')" class="flex-1 py-3 px-2 border-b-2 border-amber-500 text-amber-700 flex items-center justify-center gap-1.5">
+                        <i data-lucide="pencil-line" class="w-3.5 h-3.5"></i> Notas
+                    </button>
+                    <button id="btnTabMarked" onclick="switchPanelTab('marked')" class="flex-1 py-3 px-2 border-b-2 border-transparent text-stone-500 flex items-center justify-center gap-1.5">
+                        <i data-lucide="highlighter" class="w-3.5 h-3.5"></i> Destaques
+                    </button>
+                    <button id="btnTabNotebook" onclick="switchPanelTab('notebook')" class="flex-1 py-3 px-2 border-b-2 border-transparent text-stone-500 flex items-center justify-center gap-1.5">
+                        <i data-lucide="notebook" class="w-3.5 h-3.5"></i> Caderno
+                    </button>
+                </div>
+                <button onclick="toggleMaximizeWindow('sidebar')" class="p-1 hover:bg-stone-200 rounded text-stone-600 ml-2">
+                    <i id="sidebarMaxIcon" data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto no-scrollbar flex flex-col">
+                <div id="universalFilterBox" class="mb-3 hidden space-y-1.5 bg-stone-50 p-2.5 rounded-xl border">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Foco de Escopo</label>
+                    <div class="flex gap-2">
+                        <select id="dataScopeSelect" onchange="handleScopeFilterChange()" class="flex-1 text-xs p-2 border rounded-lg bg-white font-medium focus:outline-none">
+                            <option value="chapter">Capítulo Atual</option>
+                            <option value="book">Livro Atual Completo</option>
+                            <option value="specific">Livro Específico...</option>
+                            <option value="all">Ver Tudo Salvo</option>
+                        </select>
+                        <select id="specificBookFilter" onchange="renderActiveTabs()" class="hidden flex-1 text-xs p-2 border rounded-lg bg-white font-medium focus:outline-none"></select>
+                    </div>
+                </div>
+
+                <div id="panelNotes" class="flex-1 flex flex-col gap-2">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[10px] font-bold uppercase opacity-60">Bloco de Notas Ativo</span>
+                        <span id="savedIndicator" class="text-xs text-emerald-600 font-medium opacity-0 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Salvo</span>
+                    </div>
+                    <div id="notesContainerWrapper" class="flex-1 flex flex-col gap-3 overflow-y-auto no-scrollbar">
+                        <textarea id="studyNotes" oninput="saveCurrentNoteState()" placeholder="Escreva suas reflexões deste capítulo aqui..." class="flex-1 w-full p-3 border rounded-xl focus:outline-none bg-stone-50/40 text-sm resize-none"></textarea>
+                    </div>
+                    <div id="filteredNotesListView" class="hidden flex-1 space-y-2 overflow-y-auto no-scrollbar"></div>
+                </div>
+
+                <div id="panelMarked" class="hidden flex-1 flex flex-col">
+                    <div id="wordMarkedContainer" class="space-y-2 text-xs flex-1 overflow-y-auto no-scrollbar"></div>
+                </div>
+
+                <div id="panelNotebook" class="hidden flex-1 flex flex-col gap-3">
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="newTopicInput" placeholder="Novo tema (ex: Fé, Graça)..." class="flex-1 text-xs p-2 border rounded-xl focus:outline-none card-bg">
+                        <button onclick="createNewStudyTopic()" class="p-2 bg-amber-600 text-white rounded-xl hover:bg-amber-700 text-xs font-bold flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4"></i> Criar</button>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="searchTopicInput" oninput="renderNotebook()" placeholder="Pesquisar nos seus temas estudados..." class="w-full text-xs p-2 pl-8 border rounded-xl focus:outline-none bg-stone-50 text-stone-800">
+                        <div class="absolute inset-y-0 left-2.5 flex items-center pointer-events-none opacity-40">
+                            <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                        </div>
+                    </div>
+                    <hr class="opacity-40">
+                    <div id="notebookTopicsContainer" class="flex-1 space-y-3 overflow-y-auto no-scrollbar"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="topicExpandedModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="card-bg rounded-2xl border p-6 max-w-2xl w-full h-[85vh] flex flex-col gap-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b pb-3">
+                <div class="flex items-center gap-2 text-amber-700">
+                    <i data-lucide="notebook" class="w-5 h-5"></i>
+                    <h3 id="expandedTopicTitle" class="font-bold text-lg text-stone-800 dark:text-white">Tema</h3>
+                </div>
+                <button onclick="closeTopicExpandedModal()" class="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-slate-700 text-stone-500 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden">
+                <div class="flex flex-col gap-2 overflow-y-auto no-scrollbar border-r pr-2 border-stone-200 dark:border-slate-700">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-stone-500">Versículos Vinculados</h4>
+                    <div id="expandedTopicVerses" class="space-y-2"></div>
+                </div>
+                <div class="flex flex-col gap-2 h-full">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-stone-500">Notas de Estudo do Tema</h4>
+                        <span id="topicNotesSavedIndicator" class="text-xs text-emerald-600 font-medium opacity-0 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Salvo</span>
+                    </div>
+                    <textarea id="expandedTopicNotesArea" oninput="saveExpandedTopicNotes()" placeholder="Escreva aqui reflexões profundas, comentários e conexões sobre este tema específico..." class="flex-1 w-full p-3 border rounded-xl focus:outline-none bg-stone-50/40 text-sm resize-none"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="card-bg rounded-2xl border p-5 max-w-xs w-full space-y-4 shadow-2xl text-center">
+            <div class="text-red-500 w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto border border-red-200">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-base">Apagar este tema?</h4>
+                <p class="text-xs text-stone-500 mt-1">Todas as notas e referências atreladas a este tema serão permanentemente removidas.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="closeDeleteModal()" class="py-2 text-xs border rounded-xl font-medium hover:bg-stone-100">Cancelar</button>
+                <button id="confirmDeleteBtn" class="py-2 text-xs bg-red-600 text-white rounded-xl font-bold hover:bg-red-700">Apagar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="card-bg rounded-2xl border p-6 max-w-sm w-full space-y-5 shadow-xl">
+            <div class="flex items-center justify-between border-b pb-2">
+                <h3 class="font-bold text-base flex items-center gap-2"><i data-lucide="sliders" class="w-4 h-4 text-amber-600"></i> Ajustes</h3>
+                <button onclick="toggleSettingsModal()" class="opacity-60 hover:opacity-100"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-2">
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="changeSiteTheme('light')" class="p-2 text-xs border rounded-xl bg-white text-slate-800">Claro</button>
+                    <button onclick="changeSiteTheme('sepia')" class="p-2 text-xs border rounded-xl bg-[#fdf6e3] text-[#433422]">Creme</button>
+                    <button onclick="changeSiteTheme('dark')" class="p-2 text-xs border rounded-xl bg-slate-900 text-white">Escuro</button>
+                </div>
+            </div>
+            <div class="flex items-center justify-between p-2.5 bg-stone-50 dark:bg-slate-800 rounded-xl border">
+                <span class="text-xs font-bold opacity-90 flex items-center gap-1.5">
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> Copiar versículo inteiro sempre
+                </span>
+                <button id="smartCopyToggle" onclick="toggleSmartCopyMode()" class="relative inline-flex h-5 w-9 items-center rounded-full bg-stone-300 transition-colors focus:outline-none">
+                    <span id="smartCopySwitch" class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform translate-x-1"></span>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-bold flex justify-between">Tamanho da Fonte <span id="lblFontSize">18px</span></label>
+                <input type="range" id="inputFontSize" min="14" max="28" value="18" oninput="applyAccessibilitySettings()" class="w-full accent-amber-600">
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-bold flex justify-between">Espaçamento de Linhas <span id="lblLineHeight">1.75</span></label>
+                <input type="range" id="inputLineHeight" min="1.3" max="2.4" step="0.1" value="1.7" oninput="applyAccessibilitySettings()" class="w-full accent-amber-600">
+            </div>
+        </div>
+    </div>
+
+    <div id="customToast" class="fixed bottom-5 right-5 bg-stone-900 text-white text-xs font-medium py-3 px-5 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 z-50">
+        <i data-lucide="copy" class="w-4 h-4 text-amber-400"></i><span id="toastMessage">Copiado!</span>
+    </div>
+
+    <script>
+        const bibleBooks = [
+            { name: "Gênesis", abbrev: ["gn", "genesis"], id: "gen", chaps: 50 },
+            { name: "Êxodo", abbrev: ["ex", "exodo"], id: "exo", chaps: 40 },
+            { name: "Levítico", abbrev: ["lv", "levitico"], id: "lev", chaps: 27 },
+            { name: "Números", abbrev: ["nu", "num", "numeros"], id: "num", chaps: 36 },
+            { name: "Deuteronômio", abbrev: ["dt", "deut", "deuteronomio"], id: "deu", chaps: 34 },
+            { name: "Josué", abbrev: ["js", "josue"], id: "jos", chaps: 24 },
+            { name: "Juízes", abbrev: ["jz", "juizes"], id: "jdg", chaps: 21 },
+            { name: "Rute", abbrev: ["rt", "rute"], id: "rut", chaps: 4 },
+            { name: "1 Samuel", abbrev: ["1sm", "1sam", "1 samuel"], id: "1sa", chaps: 31 },
+            { name: "2 Samuel", abbrev: ["2sm", "2sam", "2 samuel"], id: "2sa", chaps: 24 },
+            { name: "1 Reis", abbrev: ["1rs", "1reis", "1 reis"], id: "1ki", chaps: 22 },
+            { name: "2 Reis", abbrev: ["2rs", "2reis", "2 reis"], id: "2ki", chaps: 25 },
+            { name: "1 Crônicas", abbrev: ["1cr", "1cronicas"], id: "1ch", chaps: 29 },
+            { name: "2 Crônicas", abbrev: ["2cr", "2cronicas"], id: "2ch", chaps: 36 },
+            { name: "Esdras", abbrev: ["ez", "esdras"], id: "ezr", chaps: 10 },
+            { name: "Neemias", abbrev: ["ne", "neemias"], id: "neh", chaps: 13 },
+            { name: "Ester", abbrev: ["est", "ester"], id: "est", chaps: 10 },
+            { name: "Jó", abbrev: ["jo", "job"], id: "job", chaps: 42 },
+            { name: "Salmos", abbrev: ["sl", "salmos", "ps"], id: "psa", chaps: 150 },
+            { name: "Provérbios", abbrev: ["pv", "proverbios", "pr"], id: "pro", chaps: 31 },
+            { name: "Eclesiastes", abbrev: ["ec", "eclesiastes"], id: "ecc", chaps: 12 },
+            { name: "Cânticos", abbrev: ["ct", "canticos", "cantares"], id: "sng", chaps: 8 },
+            { name: "Isaías", abbrev: ["is", "isaias"], id: "isa", chaps: 66 },
+            { name: "Jeremias", abbrev: ["jr", "jeremias"], id: "jer", chaps: 52 },
+            { name: "Lamentações", abbrev: ["lm", "lamentacoes"], id: "lam", chaps: 5 },
+            { name: "Ezequiel", abbrev: ["ez", "ezequiel"], id: "ezk", chaps: 48 },
+            { name: "Daniel", abbrev: ["dn", "daniel"], id: "dan", chaps: 12 },
+            { name: "Oséias", abbrev: ["os", "oseias"], id: "hos", chaps: 14 },
+            { name: "Joel", abbrev: ["jl", "joel"], id: "jol", chaps: 3 },
+            { name: "Amós", abbrev: ["am", "amos"], id: "amo", chaps: 9 },
+            { name: "Obadias", abbrev: ["ob", "obadias"], id: "oba", chaps: 1 },
+            { name: "Jonas", abbrev: ["jn", "jonas"], id: "jon", chaps: 4 },
+            { name: "Miqueias", abbrev: ["mq", "miqueias"], id: "mic", chaps: 7 },
+            { name: "Naum", abbrev: ["na", "naum"], id: "nam", chaps: 3 },
+            { name: "Habacuque", abbrev: ["hc", "habacuque"], id: "hab", chaps: 3 },
+            { name: "Sofonias", abbrev: ["sf", "sofonias"], id: "zep", chaps: 3 },
+            { name: "Ageu", abbrev: ["ag", "ageu"], id: "hag", chaps: 2 },
+            { name: "Zacarias", abbrev: ["zc", "zacarias"], id: "zec", chaps: 14 },
+            { name: "Malaquias", abbrev: ["ml", "malaquias"], id: "mal", chaps: 4 },
+            { name: "Mateus", abbrev: ["mt", "mateus"], id: "mat", chaps: 28 },
+            { name: "Marcos", abbrev: ["mc", "marcos"], id: "mrk", chaps: 16 },
+            { name: "Lucas", abbrev: ["lc", "lucas"], id: "luk", chaps: 24 },
+            { name: "João", abbrev: ["jo", "joao"], id: "jhn", chaps: 21 },
+            { name: "Atos", abbrev: ["at", "atos"], id: "act", chaps: 28 },
+            { name: "Romanos", abbrev: ["rm", "romanos"], id: "rom", chaps: 16 },
+            { name: "1 Coríntios", abbrev: ["1co", "1corintios"], id: "1co", chaps: 16 },
+            { name: "2 Coríntios", abbrev: ["2co", "2corintios"], id: "2co", chaps: 13 },
+            { name: "Gálatas", abbrev: ["gl", "galatas"], id: "gal", chaps: 6 },
+            { name: "Efésios", abbrev: ["ef", "efesios"], id: "eph", chaps: 6 },
+            { name: "Filipenses", abbrev: ["fl", "filipenses"], id: "php", chaps: 4 },
+            { name: "Colossenses", abbrev: ["cl", "colossenses"], id: "col", chaps: 4 },
+            { name: "1 Tessalonicenses", abbrev: ["1ts", "1tessalonicenses"], id: "1th", chaps: 5 },
+            { name: "2 Tessalonicenses", abbrev: ["2ts", "2tessalonicenses"], id: "2th", chaps: 3 },
+            { name: "1 Timóteo", abbrev: ["1tm", "1timoteo"], id: "1ti", chaps: 6 },
+            { name: "2 Timóteo", abbrev: ["2tm", "2timoteo"], id: "2ti", chaps: 4 },
+            { name: "Tito", abbrev: ["tt", "tito"], id: "tit", chaps: 3 },
+            { name: "Filemom", abbrev: ["fm", "filemom"], id: "phm", chaps: 1 },
+            { name: "Hebreus", abbrev: ["hb", "hebreus"], id: "heb", chaps: 13 },
+            { name: "Tiago", abbrev: ["tg", "tiago"], id: "jas", chaps: 5 },
+            { name: "1 Pedro", abbrev: ["1pe", "1pedro"], id: "1pe", chaps: 5 },
+            { name: "2 Pedro", abbrev: ["2pe", "2pedro"], id: "2pe", chaps: 3 },
+            { name: "1 João", abbrev: ["1jo", "1joao"], id: "1jn", chaps: 5 },
+            { name: "2 João", abbrev: ["2jo", "2joao"], id: "2jn", chaps: 1 },
+            { name: "3 João", abbrev: ["3jo", "3joao"], id: "3jn", chaps: 1 },
+            { name: "Judas", abbrev: ["jd", "judas"], id: "jud", chaps: 1 },
+            { name: "Apocalipse", abbrev: ["ap", "apocalipse"], id: "rev", chaps: 22 }
+        ];
+
+        let currentBook = bibleBooks[61]; 
+        let currentChapter = 1;
+        let currentTranslation = "almeida";
+        let activeTab = "notes";
+        let smartCopyEnabled = false;
+        let targetDeleteIndex = null;
+        let currentAbortController = null;
+        let expandedTopicIndex = null;
+
+        let persistentHighlights = {}; 
+        let chapterNotes = {}; 
+        let notebookStudies = []; 
+        let collapsedTopics = {};
+
+        window.onload = async function() {
+            lucide.createIcons();
+            loadSavedData();
+            initDropdowns();
+            buildBookDropdownOptions();
+            applyAccessibilitySettings();
+            updateSmartCopyUI();
+            await fetchChapter();
+            
+            document.addEventListener('copy', handleAdvancedCopy);
+            document.addEventListener('keydown', handleKeyboardNavigation);
+            
+            document.addEventListener('click', (e) => {
+                if (!document.getElementById('bookDropdownBtn').contains(e.target) && !document.getElementById('bookDropdownPanel').contains(e.target)) {
+                    document.getElementById('bookDropdownPanel').classList.add('hidden');
+                }
+            });
+        };
+
+        function initDropdowns() {
+            const versionSelect = document.getElementById('versionSelect');
+            const filterBookSelect = document.getElementById('specificBookFilter');
+            
+            filterBookSelect.innerHTML = '';
+            bibleBooks.forEach((book, idx) => {
+                const optFilter = document.createElement('option');
+                optFilter.value = idx; optFilter.textContent = book.name;
+                filterBookSelect.appendChild(optFilter);
+            });
+            
+            filterBookSelect.value = bibleBooks.indexOf(currentBook);
+            versionSelect.value = currentTranslation;
+            updateChaptersSelect();
+
+            document.getElementById('chapterSelect').addEventListener('change', async (e) => {
+                currentChapter = parseInt(e.target.value);
+                saveCurrentState();
+                await fetchChapter();
+            });
+
+            versionSelect.addEventListener('change', async (e) => {
+                currentTranslation = e.target.value;
+                saveCurrentState();
+                await fetchChapter();
+            });
+        }
+
+        function toggleBookDropdown() {
+            const panel = document.getElementById('bookDropdownPanel');
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden')) {
+                const input = document.getElementById('bookSearchInput');
+                input.value = '';
+                input.focus();
+                filterBooks();
+            }
+        }
+
+        function buildBookDropdownOptions() {
+            const list = document.getElementById('bookOptionsList');
+            list.innerHTML = '';
+            bibleBooks.forEach((book, idx) => {
+                const item = document.createElement('div');
+                item.className = "p-2 hover:bg-amber-50 rounded-lg cursor-pointer flex justify-between items-center font-medium book-opt-node";
+                item.setAttribute('data-index', idx);
+                item.setAttribute('data-search-terms', `${book.name.toLowerCase()} ${book.abbrev.join(' ')}`);
+                item.innerHTML = `<span>${book.name}</span><span class="opacity-40 text-[10px] uppercase font-bold">${book.id}</span>`;
+                
+                item.onclick = async () => {
+                    currentBook = book;
+                    currentChapter = 1;
+                    document.getElementById('selectedBookLabel').textContent = book.name;
+                    document.getElementById('bookDropdownPanel').classList.add('hidden');
+                    updateChaptersSelect();
+                    saveCurrentState();
+                    await fetchChapter();
+                };
+                list.appendChild(item);
+            });
+            document.getElementById('selectedBookLabel').textContent = currentBook.name;
+        }
+
+        function filterBooks() {
+            const query = document.getElementById('bookSearchInput').value.toLowerCase().trim();
+            document.querySelectorAll('.book-opt-node').forEach(item => {
+                const terms = item.getAttribute('data-search-terms');
+                item.classList.toggle('hidden', !terms.includes(query));
+            });
+        }
+
+        function updateChaptersSelect() {
+            const chapSelect = document.getElementById('chapterSelect');
+            chapSelect.innerHTML = '';
+            
+            const maxChaps = currentBook.chaps || 1;
+            for (let i = 1; i <= maxChaps; i++) {
+                const opt = document.createElement('option');
+                opt.value = i; opt.textContent = `${i}`;
+                chapSelect.appendChild(opt);
+            }
+            chapSelect.value = currentChapter;
+        }
+
+        async function navigateChapter(direction) {
+            try {
+                let currentBookIndex = bibleBooks.indexOf(currentBook);
+                let targetChapter = currentChapter + direction;
+                const maxChaps = currentBook.chaps || 1;
+
+                if (targetChapter < 1) {
+                    if (currentBookIndex > 0) {
+                        currentBookIndex--;
+                        currentBook = bibleBooks[currentBookIndex];
+                        currentChapter = currentBook.chaps || 1;
+                    } else {
+                        return;
+                    }
+                } else if (targetChapter > maxChaps) {
+                    if (currentBookIndex < bibleBooks.length - 1) {
+                        currentBookIndex++;
+                        currentBook = bibleBooks[currentBookIndex];
+                        currentChapter = 1;
+                    } else {
+                        return;
+                    }
+                } else {
+                    currentChapter = targetChapter;
+                }
+
+                document.getElementById('selectedBookLabel').textContent = currentBook.name;
+                updateChaptersSelect();
+                document.getElementById('chapterSelect').value = currentChapter;
+                saveCurrentState();
+                await fetchChapter();
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function handleKeyboardNavigation(e) {
+            const activeEl = document.activeElement.tagName;
+            if (activeEl === 'INPUT' || activeEl === 'TEXTAREA') return;
+
+            if (e.key === 'ArrowLeft') {
+                navigateChapter(-1);
+            } else if (e.key === 'ArrowRight') {
+                navigateChapter(1);
+            }
+        }
+
+        async function fetchChapter() {
+            if (currentAbortController) {
+                currentAbortController.abort();
+            }
+            currentAbortController = new AbortController();
+            const { signal } = currentAbortController;
+
+            const container = document.getElementById('bibleTextContainer');
+            container.innerHTML = `<div class="space-y-3"><div class="h-4 shimmer rounded w-3/4"></div><div class="h-4 shimmer rounded w-5/6"></div></div>`;
+            
+            document.getElementById('currentLocationTitle').textContent = `${currentBook.name} ${currentChapter} (${currentTranslation.toUpperCase()})`;
+
+            const activeApiId = currentBook.id; 
+            try {
+                const response = await fetch(`https://bible-api.com/${encodeURIComponent(activeApiId)}+${currentChapter}?translation=${currentTranslation}`, { signal });
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                
+                const pageKey = `${currentTranslation}_${bibleBooks.indexOf(currentBook)}_${currentChapter}`;
+                if (persistentHighlights[pageKey]) {
+                    container.innerHTML = persistentHighlights[pageKey];
+                    if(smartCopyEnabled) rebindSmartClickHandlers();
+                } else {
+                    buildFreshVerses(data.verses || []);
+                }
+                renderActiveTabs();
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                container.innerHTML = `<p class="text-center text-red-500 py-6 text-sm font-semibold">Erro ao carregar. Tente mudar de capítulo.</p>`;
+            }
+        }
+
+        function buildFreshVerses(verses) {
+            const container = document.getElementById('bibleTextContainer');
+            container.innerHTML = '';
+            verses.forEach(vObj => {
+                const p = document.createElement('p');
+                p.className = "verse-paragraph tracking-normal transition-all text-justify text-slate-800 dark:text-slate-100";
+                if(smartCopyEnabled) p.classList.add('verse-clickable');
+                p.setAttribute('data-verse-raw', vObj.text.trim());
+                p.innerHTML = `<span class="v-num-mark font-bold text-amber-800 dark:text-amber-500 text-xs mr-2 select-none" data-v="${vObj.verse}">${vObj.verse}</span><span class="v-content-node">${vObj.text.trim()}</span>`;
+                
+                if(smartCopyEnabled) {
+                    p.onclick = () => handleVerseSmartClick(p);
+                }
+                container.appendChild(p);
+            });
+            applyAccessibilitySettings();
+        }
+
+        function toggleSmartCopyMode() {
+            smartCopyEnabled = !smartCopyEnabled;
+            localStorage.setItem('b_smart_copy', smartCopyEnabled);
+            updateSmartCopyUI();
+            
+            document.querySelectorAll('.verse-paragraph').forEach(p => {
+                if(smartCopyEnabled) {
+                    p.classList.add('verse-clickable');
+                    p.onclick = () => handleVerseSmartClick(p);
+                } else {
+                    p.classList.remove('verse-clickable');
+                    p.onclick = null;
+                }
+            });
+        }
+
+        function updateSmartCopyUI() {
+            const sw = document.getElementById('smartCopySwitch');
+            const btn = document.getElementById('smartCopyToggle');
+            if(!sw || !btn) return;
+            if(smartCopyEnabled) {
+                sw.className = "inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform translate-x-4";
+                btn.className = "relative inline-flex h-5 w-9 items-center rounded-full bg-amber-600 transition-colors focus:outline-none";
+            } else {
+                sw.className = "inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform translate-x-1";
+                btn.className = "relative inline-flex h-5 w-9 items-center rounded-full bg-stone-300 transition-colors focus:outline-none";
+            }
+        }
+
+        function handleVerseSmartClick(pElement) {
+            const verseText = pElement.getAttribute('data-verse-raw');
+            const vNum = pElement.querySelector('.v-num-mark').getAttribute('data-v');
+            const fullRef = `"${verseText}" (${currentBook.name} ${currentChapter}:${vNum} ${currentTranslation.toUpperCase()})`;
+            
+            navigator.clipboard.writeText(fullRef).then(() => {
+                showToast("Versículo copiado!");
+            });
+        }
+
+        function rebindSmartClickHandlers() {
+            document.querySelectorAll('.verse-paragraph').forEach(p => {
+                p.classList.add('verse-clickable');
+                p.onclick = () => handleVerseSmartClick(p);
+            });
+        }
+
+        function applyColorHighlight(className) {
+            const selection = window.getSelection();
+            if (selection.isCollapsed || !selection.rangeCount) return;
+            const range = selection.getRangeAt(0);
+            
+            const hlId = "hl_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+            const span = document.createElement('span');
+            span.className = `${className} px-0.5 rounded-sm word-hl`;
+            span.setAttribute('data-hl-id', hlId);
+
+            try {
+                range.surroundContents(span);
+                saveTextState();
+                renderActiveTabs();
+                selection.removeAllRanges();
+            } catch (e) {
+                showToast("Selecione termos dentro de apenas um versículo.");
+            }
+        }
+
+        function removeHighlightById(pageKey, hlId) {
+            const rawHtml = persistentHighlights[pageKey];
+            if(!rawHtml) return;
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = rawHtml;
+            const targetSpan = tempDiv.querySelector(`[data-hl-id="${hlId}"]`);
+            
+            if(targetSpan) {
+                const textNode = document.createTextNode(targetSpan.textContent);
+                targetSpan.parentNode.replaceChild(textNode, targetSpan);
+                persistentHighlights[pageKey] = tempDiv.innerHTML;
+                localStorage.setItem('b_multi_hl_v6', JSON.stringify(persistentHighlights));
+                
+                const activePageKey = `${currentTranslation}_${bibleBooks.indexOf(currentBook)}_${currentChapter}`;
+                if(pageKey === activePageKey) {
+                    document.getElementById('bibleTextContainer').innerHTML = tempDiv.innerHTML;
+                    if(smartCopyEnabled) rebindSmartClickHandlers();
+                }
+                renderActiveTabs();
+                showToast("Destaque removido.");
+            }
+        }
+
+        function clearSelectedHighlight() {
+            const selection = window.getSelection();
+            let targetSpan = null;
+
+            if (!selection.isCollapsed && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const container = range.commonAncestorContainer.nodeType === 3 ? range.commonAncestorContainer.parentNode : range.commonAncestorContainer;
+                targetSpan = container.closest('.word-hl');
+            } else {
+                const focusedElement = document.activeElement;
+                if (focusedElement && focusedElement.closest('.word-hl')) {
+                    targetSpan = focusedElement.closest('.word-hl');
+                }
+            }
+
+            if (!targetSpan) {
+                const containerNode = document.getElementById('bibleTextContainer');
+                if (containerNode) {
+                    const selectedText = selection.toString().trim();
+                    if(selectedText) {
+                        const spans = containerNode.querySelectorAll('.word-hl');
+                        for (let s of spans) {
+                            if (s.textContent.includes(selectedText) || selectedText.includes(s.textContent)) {
+                                targetSpan = s;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (targetSpan) {
+                const hlId = targetSpan.getAttribute('data-hl-id');
+                const pageKey = `${currentTranslation}_${bibleBooks.indexOf(currentBook)}_${currentChapter}`;
+                if (hlId) {
+                    removeHighlightById(pageKey, hlId);
+                    selection.removeAllRanges();
+                    return;
+                }
+                const textNode = document.createTextNode(targetSpan.textContent);
+                targetSpan.parentNode.replaceChild(textNode, targetSpan);
+                saveTextState();
+                renderActiveTabs();
+                showToast("Destaque limpo!");
+                selection.removeAllRanges();
+            } else {
+                showToast("Dê um clique simples em cima da palavra marcada para usar a borracha inteligente.");
+            }
+        }
+
+        function handleAdvancedCopy(event) {
+            if(smartCopyEnabled) return;
+            const selection = window.getSelection();
+            if (selection.isCollapsed) return;
+            event.preventDefault();
+            const range = selection.getRangeAt(0);
+            let parentParagraph = range.commonAncestorContainer;
+            while (parentParagraph && parentParagraph.nodeName !== 'P') parentParagraph = parentParagraph.parentNode;
+            if (!parentParagraph) return;
+
+            const rawFullText = parentParagraph.getAttribute('data-verse-raw');
+            const selectedText = selection.toString().trim();
+            const verseNum = parentParagraph.querySelector('.v-num-mark').getAttribute('data-v');
+
+            let output = selectedText;
+            if (!rawFullText.startsWith(selectedText)) output = "[...] " + output;
+            if (!rawFullText.endsWith(selectedText)) output = output + " [...]";
+
+            const finalResult = `"${output}" (${currentBook.name} ${currentChapter}:${verseNum} ${currentTranslation.toUpperCase()})`;
+            if (event.clipboardData) event.clipboardData.setData('text/plain', finalResult);
+            showToast(`Copiado!`);
+        }
+
+        function saveTextState() {
+            const pageKey = `${currentTranslation}_${bibleBooks.indexOf(currentBook)}_${currentChapter}`;
+            persistentHighlights[pageKey] = document.getElementById('bibleTextContainer').innerHTML;
+            localStorage.setItem('b_multi_hl_v6', JSON.stringify(persistentHighlights));
+        }
+
+        function toggleMaximizeWindow(target) {
+            const reader = document.getElementById('sectionReader');
+            const sidebar = document.getElementById('sectionSidebar');
+            const rIcon = document.getElementById('readerMaxIcon');
+            const sIcon = document.getElementById('sidebarMaxIcon');
+
+            if(target === 'reader') {
+                if(reader.classList.contains('lg:col-span-12')) {
+                    reader.className = "lg:col-span-7 xl:col-span-8 flex flex-col card-bg rounded-2xl border shadow-sm overflow-hidden h-auto lg:min-h-[600px] transition-all duration-300 relative group";
+                    sidebar.classList.remove('hidden');
+                    rIcon.setAttribute('data-lucide', 'maximize-2');
+                } else {
+                    reader.className = "lg:col-span-12 flex flex-col card-bg rounded-2xl border shadow-sm overflow-hidden h-auto lg:min-h-[600px] transition-all duration-300 relative group";
+                    sidebar.classList.add('hidden');
+                    rIcon.setAttribute('data-lucide', 'minimize-2');
+                }
+            } else if(target === 'sidebar') {
+                if(sidebar.classList.contains('lg:col-span-12')) {
+                    sidebar.className = "lg:col-span-5 xl:col-span-4 flex flex-col card-bg rounded-2xl border shadow-sm overflow-hidden h-[600px] transition-all duration-300";
+                    reader.classList.remove('hidden');
+                    sIcon.setAttribute('data-lucide', 'maximize-2');
+                } else {
+                    sidebar.className = "lg:col-span-12 flex flex-col card-bg rounded-2xl border shadow-sm overflow-hidden h-[600px] transition-all duration-300";
+                    reader.classList.add('hidden');
+                    sIcon.setAttribute('data-lucide', 'minimize-2');
+                }
+            }
+            lucide.createIcons();
+        }
+
+        function handleScopeFilterChange() {
+            if (document.getElementById('dataScopeSelect').value === 'specific') {
+                document.getElementById('specificBookFilter').classList.remove('hidden');
+            } else {
+                document.getElementById('specificBookFilter').classList.add('hidden');
+            }
+            renderActiveTabs();
+        }
+
+        function renderActiveTabs() {
+            const filterValue = document.getElementById('dataScopeSelect').value;
+            const specificIdx = parseInt(document.getElementById('specificBookFilter').value);
+            const bookIdx = bibleBooks.indexOf(currentBook);
+
+            const wrapper = document.getElementById('notesContainerWrapper');
+            const listArea = document.getElementById('filteredNotesListView');
+            
+            if (activeTab === 'notes') {
+                if (filterValue === 'chapter') {
+                    wrapper.classList.remove('hidden');
+                    listArea.classList.add('hidden');
+                    const noteKey = `${currentTranslation}_${bookIdx}_${currentChapter}`;
+                    document.getElementById('studyNotes').value = chapterNotes[noteKey] || '';
+                } else {
+                    wrapper.classList.add('hidden');
+                    listArea.classList.remove('hidden');
+                    listArea.innerHTML = '';
+                    
+                    Object.keys(chapterNotes).forEach(key => {
+                        const parts = key.split('_');
+                        const ver = parts[0], bIdx = parseInt(parts[1]), ch = parts[2];
+                        let match = false;
+                        if (filterValue === 'book' && ver === currentTranslation && bIdx === bookIdx) match = true;
+                        if (filterValue === 'specific' && ver === currentTranslation && bIdx === specificIdx) match = true;
+                        if (filterValue === 'all') match = true;
+
+                        if (match && chapterNotes[key].trim() !== '') {
+                            const item = document.createElement('div');
+                            item.className = "p-2.5 border rounded-xl bg-stone-50/70 hover:border-amber-400 cursor-pointer text-xs space-y-1 card-bg";
+                            item.onclick = () => navigateTo(bIdx, ch);
+                            item.innerHTML = `<div class="flex justify-between font-bold text-amber-800 dark:text-amber-500"><span>${bibleBooks[bIdx].name} ${ch}</span><span class="opacity-50">${ver.toUpperCase()}</span></div><p class="text-stone-700 font-medium line-clamp-3">${chapterNotes[key]}</p>`;
+                            listArea.appendChild(item);
+                        }
+                    });
+                }
+            }
+
+            if (activeTab === 'marked') {
+                const markedPanel = document.getElementById('wordMarkedContainer');
+                markedPanel.innerHTML = '';
+                let combined = [];
+
+                Object.keys(persistentHighlights).forEach(key => {
+                    const parts = key.split('_');
+                    const ver = parts[0], bIdx = parseInt(parts[1]), ch = parts[2];
+                    let match = false;
+                    if (filterValue === 'chapter' && ver === currentTranslation && bIdx === bookIdx && ch === String(currentChapter)) match = true;
+                    if (filterValue === 'book' && ver === currentTranslation && bIdx === bookIdx) match = true;
+                    if (filterValue === 'specific' && ver === currentTranslation && bIdx === specificIdx) match = true;
+                    if (filterValue === 'all') match = true;
+
+                    if (match) {
+                        const tDiv = document.createElement('div');
+                        tDiv.innerHTML = persistentHighlights[key];
+                        tDiv.querySelectorAll('.word-hl').forEach(el => {
+                            const hlId = el.getAttribute('data-hl-id') || "";
+                            combined.push({ text: el.textContent, cls: el.className.split(' ')[0], bIdx, ch, ver, pageKey: key, hlId });
+                        });
+                    }
+                });
+
+                if(!combined.length) {
+                    markedPanel.innerHTML = '<p class="text-center italic text-stone-400 py-4">Nenhum termo marcado.</p>';
+                    return;
+                }
+
+                combined.forEach(item => {
+                    const block = document.createElement('div');
+                    block.className = "p-2 border rounded-xl bg-stone-50/70 hover:border-amber-400 flex flex-col gap-1 shadow-xs relative group card-bg";
+                    
+                    const contentClickable = document.createElement('div');
+                    contentClickable.className = "cursor-pointer flex flex-col gap-0.5 flex-1 pr-6";
+                    contentClickable.onclick = () => navigateTo(item.bIdx, item.ch);
+                    contentClickable.innerHTML = `
+                        <div class="flex items-center justify-between opacity-70 text-[10px] font-bold">
+                            <span>${bibleBooks[item.bIdx].name} ${item.ch}</span>
+                            <span class="bg-stone-200 dark:bg-slate-700 px-1 rounded text-stone-600 dark:text-slate-300">${item.ver.toUpperCase()}</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="italic font-medium text-stone-800">"${item.text}"</span>
+                            <span class="w-2.5 h-2.5 rounded-full ${item.cls} flex-shrink-0"></span>
+                        </div>`;
+                    
+                    const closeBtn = document.createElement('button');
+                    closeBtn.className = "absolute right-2 top-2 p-1 text-stone-400 hover:text-red-500 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer z-10";
+                    closeBtn.innerHTML = `<i data-lucide="x" class="w-3.5 h-3.5"></i>`;
+                    closeBtn.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        removeHighlightById(item.pageKey, item.hlId);
+                    };
+
+                    block.appendChild(contentClickable);
+                    block.appendChild(closeBtn);
+                    markedPanel.appendChild(block);
+                });
+                lucide.createIcons();
+            }
+        }
+
+        async function navigateTo(bookIndex, chapterNum) {
+            currentBook = bibleBooks[bookIndex];
+            currentChapter = parseInt(chapterNum);
+            document.getElementById('selectedBookLabel').textContent = currentBook.name;
+            updateChaptersSelect();
+            document.getElementById('chapterSelect').value = currentChapter;
+            saveCurrentState();
+            await fetchChapter();
+        }
+
+        function saveCurrentNoteState() {
+            const noteKey = `${currentTranslation}_${bibleBooks.indexOf(currentBook)}_${currentChapter}`;
+            chapterNotes[noteKey] = document.getElementById('studyNotes').value;
+            localStorage.setItem('b_chapter_notes_v6', JSON.stringify(chapterNotes));
+            const ind = document.getElementById('savedIndicator');
+            ind.style.opacity = '1'; setTimeout(() => ind.style.opacity = '0', 800);
+        }
+
+        function createNewStudyTopic() {
+            const input = document.getElementById('newTopicInput');
+            const title = input.value.trim();
+            if(!title) return;
+            
+            const newIndex = notebookStudies.length;
+            notebookStudies.push({ title: title, items: [], notes: "" });
+            collapsedTopics[newIndex] = true; 
+            
+            input.value = '';
+            localStorage.setItem('b_notebook_v6', JSON.stringify(notebookStudies));
+            localStorage.setItem('b_collapsed_v6', JSON.stringify(collapsedTopics));
+            renderNotebook();
+        }
+
+        function askDeleteTopic(index) {
+            targetDeleteIndex = index;
+            const modal = document.getElementById('deleteConfirmModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('confirmDeleteBtn').onclick = executeDeleteTopic;
+        }
+
+        function executeDeleteTopic() {
+            if(targetDeleteIndex !== null) {
+                notebookStudies.splice(targetDeleteIndex, 1);
+                localStorage.setItem('b_notebook_v6', JSON.stringify(notebookStudies));
+                closeDeleteModal();
+                renderNotebook();
+                showToast("Tema excluído.");
+            }
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+            targetDeleteIndex = null;
+        }
+
+        function toggleTopicCollapse(idx) {
+            collapsedTopics[idx] = !collapsedTopics[idx];
+            localStorage.setItem('b_collapsed_v6', JSON.stringify(collapsedTopics));
+            renderNotebook();
+        }
+
+        function addVerseToTopic(topicIndex) {
+            const selection = window.getSelection().toString().trim();
+            if (!selection) {
+                showToast("Selecione um texto primeiro!");
+                return;
+            }
+            notebookStudies[topicIndex].items.push({
+                text: selection,
+                ref: `${currentBook.name} ${currentChapter}`,
+                bIdx: bibleBooks.indexOf(currentBook),
+                ch: currentChapter,
+                vId: "v_" + Date.now() + "_" + Math.floor(Math.random() * 100)
+            });
+            localStorage.setItem('b_notebook_v6', JSON.stringify(notebookStudies));
+            renderNotebook();
+            showToast("Anexado com sucesso!");
+        }
+
+        function removeVerseFromTopic(topicIdx, vId) {
+            notebookStudies[topicIdx].items = notebookStudies[topicIdx].items.filter(it => it.vId !== vId);
+            localStorage.setItem('b_notebook_v6', JSON.stringify(notebookStudies));
+            renderNotebook();
+            if(expandedTopicIndex === topicIdx) {
+                openTopicExpanded(topicIdx);
+            }
+            showToast("Trecho removido do tema.");
+        }
+
+        function openTopicExpanded(idx) {
+            expandedTopicIndex = idx;
+            const topic = notebookStudies[idx];
+            if(!topic) return;
+
+            document.getElementById('expandedTopicTitle').textContent = topic.title;
+            document.getElementById('expandedTopicNotesArea').value = topic.notes || "";
+            
+            const vContainer = document.getElementById('expandedTopicVerses');
+            vContainer.innerHTML = "";
+            
+            if(!topic.items || !topic.items.length) {
+                vContainer.innerHTML = '<p class="text-xs text-stone-400 italic">Nenhum trecho anexado a este tema ainda.</p>';
+            } else {
+                topic.items.forEach(it => {
+                    const block = document.createElement('div');
+                    block.className = "bg-stone-50 dark:bg-slate-800 p-2.5 border rounded-xl text-xs space-y-1 relative group";
+                    block.innerHTML = `
+                        <p class="text-stone-700 dark:text-slate-200 italic">"${it.text}"</p>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-[10px] font-bold text-amber-800 dark:text-amber-500">— ${it.ref}</span>
+                            <button onclick="removeVerseFromTopic(${idx}, '${it.vId}')" class="text-stone-400 hover:text-red-500 p-1 rounded transition-colors cursor-pointer" title="Remover trecho">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    `;
+                    vContainer.appendChild(block);
+                });
+            }
+
+            const modal = document.getElementById('topicExpandedModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeTopicExpandedModal() {
+            document.getElementById('topicExpandedModal').classList.add('hidden');
+            expandedTopicIndex = null;
+            renderNotebook();
+        }
+
+        function saveExpandedTopicNotes() {
+            if(expandedTopicIndex === null) return;
+            const val = document.getElementById('expandedTopicNotesArea').value;
+            notebookStudies[expandedTopicIndex].notes = val;
+            localStorage.setItem('b_notebook_v6', JSON.stringify(notebookStudies));
+            
+            const ind = document.getElementById('topicNotesSavedIndicator');
+            ind.style.opacity = '1'; setTimeout(() => ind.style.opacity = '0', 800);
+        }
+
+        function renderNotebook() {
+            const container = document.getElementById('notebookTopicsContainer');
+            const searchQuery = document.getElementById('searchTopicInput').value.toLowerCase().trim();
+            container.innerHTML = '';
+            
+            notebookStudies.forEach((topic, idx) => {
+                if (searchQuery && !topic.title.toLowerCase().includes(searchQuery)) return;
+
+                if (collapsedTopics[idx] === undefined) {
+                    collapsedTopics[idx] = true;
+                }
+
+                const isCollapsed = collapsedTopics[idx];
+                const box = document.createElement('div');
+                box.className = "p-3 border rounded-xl bg-stone-50/50 space-y-2 relative group card-bg";
+                
+                let itemsHtml = '';
+                if (!isCollapsed) {
+                    topic.items.forEach(it => {
+                        itemsHtml += `
+                            <div class="bg-white dark:bg-slate-900 p-2 border border-stone-200/60 dark:border-slate-700 rounded-lg text-[11px] relative group/item">
+                                <p onclick="navigateTo(${it.bIdx}, ${it.ch})" class="italic text-stone-700 cursor-pointer hover:text-amber-600">"${it.text}"</p>
+                                <div class="flex justify-between items-center mt-1">
+                                    <b class="text-[9px] text-amber-800 dark:text-amber-500 not-italic font-bold">— ${it.ref}</b>
+                                    <button onclick="removeVerseFromTopic(${idx}, '${it.vId}')" class="text-stone-400 hover:text-red-500 transition-colors p-0.5 cursor-pointer" title="Remover">
+                                        <i data-lucide="x" class="w-3 h-3"></i>
+                                    </button>
+                                </div>
+                            </div>`;
+                    });
+                }
+
+                const eyeIcon = isCollapsed ? 'eye' : 'eye-off';
+
+                box.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleTopicCollapse(${idx})" class="p-1 hover:bg-stone-200 dark:hover:bg-slate-700 rounded text-stone-500 cursor-pointer">
+                                <i data-lucide="${eyeIcon}" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <h4 class="font-bold text-xs text-stone-800">${topic.title}</h4>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="addVerseToTopic(${idx})" class="text-[10px] bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 text-amber-900 dark:text-amber-300 px-2 py-0.5 rounded-lg font-semibold flex items-center gap-0.5 cursor-pointer">
+                                <i data-lucide="paperclip" class="w-3 h-3"></i> Anexar
+                            </button>
+                            <button onclick="openTopicExpanded(${idx})" class="p-1 text-stone-500 hover:text-amber-600 rounded transition-colors cursor-pointer" title="Expandir Tela Cheia / Anotações">
+                                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="askDeleteTopic(${idx})" class="p-1 text-stone-400 hover:text-red-500 rounded transition-colors cursor-pointer" title="Apagar Tema">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    ${!isCollapsed ? `<div class="space-y-1.5">${itemsHtml || '<p class="text-[10px] text-stone-400 italic">Nenhum trecho anexado.</p>'}</div>` : ''}
+                `;
+                container.appendChild(box);
+            });
+            lucide.createIcons();
+        }
+
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.toggle('hidden'); modal.classList.toggle('flex');
+        }
+
+        function changeSiteTheme(theme) {
+            document.body.className = `theme-${theme} min-h-screen flex flex-col`;
+            localStorage.setItem('b_site_theme', theme);
+        }
+
+        function applyAccessibilitySettings() {
+            const size = document.getElementById('inputFontSize').value;
+            const height = document.getElementById('inputLineHeight').value;
+            document.getElementById('lblFontSize').textContent = size + 'px';
+            document.getElementById('lblLineHeight').textContent = height;
+            document.querySelectorAll('.verse-paragraph').forEach(p => {
+                p.style.fontSize = size + 'px';
+                p.style.lineHeight = height;
+            });
+            localStorage.setItem('b_font_size', size);
+            localStorage.setItem('b_line_height', height);
+        }
+
+        function switchPanelTab(tab) {
+            activeTab = tab;
+            ['notes', 'marked', 'notebook'].forEach(t => {
+                const btn = document.getElementById(`btnTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                const panel = document.getElementById(`panel${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                if(t === tab) {
+                    btn.className = "flex-1 py-3 px-2 border-b-2 border-amber-500 text-amber-700 flex items-center justify-center gap-1.5";
+                    panel.classList.remove('hidden');
+                } else {
+                    btn.className = "flex-1 py-3 px-2 border-b-2 border-transparent text-stone-500 flex items-center justify-center gap-1.5";
+                    panel.classList.add('hidden');
+                }
+            });
+            const filterBox = document.getElementById('universalFilterBox');
+            if (tab === 'notebook') {
+                filterBox.classList.add('hidden');
+                renderNotebook();
+            } else {
+                filterBox.classList.remove('hidden');
+                renderActiveTabs();
+            }
+        }
+
+        function saveCurrentState() {
+            localStorage.setItem('b_book_v6', bibleBooks.indexOf(currentBook));
+            localStorage.setItem('b_chap_v6', currentChapter);
+            localStorage.setItem('b_trans_v6', currentTranslation);
+        }
+
+        function loadSavedData() {
+            if(localStorage.getItem('b_book_v6')) currentBook = bibleBooks[parseInt(localStorage.getItem('b_book_v6'))];
+            if(localStorage.getItem('b_chap_v6')) currentChapter = parseInt(localStorage.getItem('b_chap_v6'));
+            if(localStorage.getItem('b_trans_v6')) currentTranslation = localStorage.getItem('b_trans_v6');
+            if(localStorage.getItem('b_smart_copy')) smartCopyEnabled = JSON.parse(localStorage.getItem('b_smart_copy'));
+            if(localStorage.getItem('b_multi_hl_v6')) persistentHighlights = JSON.parse(localStorage.getItem('b_multi_hl_v6'));
+            if(localStorage.getItem('b_chapter_notes_v6')) chapterNotes = JSON.parse(localStorage.getItem('b_chapter_notes_v6'));
+            if(localStorage.getItem('b_notebook_v6')) notebookStudies = JSON.parse(localStorage.getItem('b_notebook_v6'));
+            if(localStorage.getItem('b_collapsed_v6')) collapsedTopics = JSON.parse(localStorage.getItem('b_collapsed_v6'));
+            if(localStorage.getItem('b_site_theme')) changeSiteTheme(localStorage.getItem('b_site_theme'));
+            if(localStorage.getItem('b_font_size')) document.getElementById('inputFontSize').value = localStorage.getItem('b_font_size');
+            if(localStorage.getItem('b_line_height')) document.getElementById('inputLineHeight').value = localStorage.getItem('b_line_height');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('customToast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
